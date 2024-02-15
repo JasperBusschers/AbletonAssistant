@@ -1,0 +1,11 @@
+X:1
+T:1-Backbeat Room
+M:4/4
+L:1/8
+Q:1/4=120
+K:Cmaj
+V:P perc stafflines=1 %%MIDI program 0 %%MIDI channel 10
+%%MIDI drummap _P bassdrum1 36
+%%MIDI drummap _S snaredrum1 38
+%%MIDI drummap _H closedhihat 42
+|:"C"[P,P] z [S,S] z [P,P] z [S,S] z | [P,P] z [S,S] z [P,P] [H,H] [S,S] z | [P,P] z [S,S] z [P,P] z [S,S] z | [P,P] z [S,S] z [P,P] [H,H] [S,S] z :|

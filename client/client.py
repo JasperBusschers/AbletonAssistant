@@ -107,7 +107,7 @@ class AbletonOSCClient:
 
         self.add_handler(address, received_response)
         self.send_message(address, params)
-        _event.wait(timeout)
+        _event.wait(timeout*5)
         self.remove_handler(address)
         if not _event.is_set():
             raise RuntimeError("No response received to query: %s" % address)

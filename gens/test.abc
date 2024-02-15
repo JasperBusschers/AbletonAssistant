@@ -1,0 +1,8 @@
+X:1
+T:1-Clav Variations
+M:4/4
+L:1/8
+K:Emin
+V:1
+%%MIDI program 7
+|:[E2E2][E2E2][G,2G,2][G,2G,2]|[A,2A,2][B,2B,2][c4e4][d4f4]| [e8e8][f8f8][g4g4][a4a4]| [b8b8]z4[G4E4]z4:|

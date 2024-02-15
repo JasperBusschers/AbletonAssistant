@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Visualizer with Prompt</title>
+<script>
+  // initData will be populated with the data passed from Flask
+  const initData = JSON.parse('{{ data_with_prompt | tojson | safe }}');
+</script>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+  }
+  input[type="password"], input[type="text"] {
+    width: calc(100% - 40px);
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  .track-container {
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .track-header {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  .clip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    padding: 0 20px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    background-color: #e9e9e9;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .clip.selected {
+    background-color: #4caf50;
+    color: #fff;
+    transform: scale(1.05);
+  }
+  .button-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  button#generate {
+    font-size: 18px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  button#generate:hover {
+    background-color: #0056b3;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .centered-text {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.label {
+  display: block;
+  text-align: center;
+  margin: 10px 0;
+}
+
+</style>
+</head>
+<body>
+
+<h1>Ableton GPT Assistant</h1>
+<p class="centered-text">This web application integrates with Ableton to understand the context of your music project. By selecting clips below, you can specify for which clips you'd like to generate melodies. The assistant uses your selections and the provided prompt to create tailored musical ideas that fit within your project's context.</p>
+<label for="openAIKeyInput" class="label">OpenAI API Key:</label>
+<input type="password" id="openAIKeyInput" placeholder="Enter OpenAI API Key here">
+<label for="promptInput" class="label">Prompt:</label>
+<input type="text" id="promptInput" placeholder="Enter your prompt here">
+<label class="label">Tracks:</label>
+<div id="tracks"></div>
+<div class="button-container">
+  <button id="generate">Generate</button>
+</div>
+<script>
+  async function generate(data) {
+    const response = await fetch('/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    return response.json();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const { tracks, prompt } = initData;
+    document.getElementById('promptInput').placeholder = prompt;
+
+    const trackContainer = document.getElementById('tracks');
+    Object.entries(tracks).forEach(([trackName, clips], trackIndex) => {
+      const trackDiv = document.createElement('div');
+      trackDiv.className = 'track-container';
+      trackDiv.dataset.trackIndex = trackIndex;
+
+      const trackHeader = document.createElement('div');
+      trackHeader.className = 'track-header';
+      trackHeader.textContent = trackName;
+      trackDiv.appendChild(trackHeader);
+
+      clips.forEach((clip, clipIndex) => {
+        const clipDiv = document.createElement('div');
+        clipDiv.className = 'clip';
+        clipDiv.textContent = clip.name;
+        clipDiv.dataset.clipIndex = clipIndex;
+        clipDiv.onclick = function() {
+          this.classList.toggle('selected');
+        };
+        trackDiv.appendChild(clipDiv);
+      });
+
+      trackContainer.appendChild(trackDiv);
+    });
+
+document.getElementById('generate').addEventListener('click', async () => {
+        const promptText = document.getElementById('promptInput').value;
+        const openAIKey = document.getElementById('openAIKeyInput').value; // Get the OpenAI API key value
+        const selectedClips = document.querySelectorAll('.clip.selected');
+        const selectionArray = [];
+        selectedClips.forEach(clip => {
+            const trackDiv = clip.parentNode;
+            const trackIndex = parseInt(trackDiv.dataset.trackIndex);
+            const clipIndex = parseInt(clip.dataset.clipIndex);
+            selectionArray.push([trackIndex, clipIndex]);
+        });
+        const dataToSend = { openAIKey: openAIKey, prompt: promptText, selection: selectionArray }; // Include the OpenAI API key in the data
+        const response = await generate(dataToSend);
+        console.log('Response:', response);
+    });
+  });
+</script>
+
+</body>
+</html>
